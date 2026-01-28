@@ -7,20 +7,46 @@ DB_URL ="https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 st.markdown("""
     <style>
-    /* Background and font */
     .stApp { background-color: #FFFFFF; }
-    h1, h2, h3 { color: #000000 !important; font-family: 'Helvetica', sans-serif; }
     
-    /* The Gray Metric Cards */
+    /* Soft Neon Floating Cards */
     [data-testid="stMetric"] {
         background-color: #F8F9FA; 
         border: 1px solid #E0E0E0;
-        padding: 20px;
+        padding: 25px;
         border-radius: 12px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
     }
-    [data-testid="stMetricLabel"] { color: #616161; font-weight: bold; }
-    [data-testid="stMetricValue"] { color: #000000; }
+
+    /* Custom CSS Device Visual (30x30 Unit) */
+    .device-box {
+        width: 280px;
+        height: 280px;
+        background: #F8F9FA;
+        border: 3px solid #E0E0E0;
+        border-radius: 20px;
+        margin: auto;
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    }
+    .device-window {
+        width: 200px;
+        height: 150px;
+        background: #FFFFFF;
+        border: 1px solid #EEEEEE;
+        margin: 30px auto;
+        border-radius: 5px;
+    }
+    .status-light {
+        width: 10px;
+        height: 10px;
+        background: #00FF00;
+        border-radius: 50%;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        box-shadow: 0 0 10px #00FF00;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -48,4 +74,5 @@ try:
 except Exception as e:
 
     st.warning("Connect plug in the hardware components to see real-time results.")
+
 
