@@ -6,7 +6,7 @@ from firebase_admin import credentials, db
 DB_URL ="https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate(st.secrets["firebase_key"])
+    cred = credentials.Certificate(dict(st.secrets["firebase_key"]))
     firebase_admin.initialize_app(cred, {'databaseURL': DB_URL})
 
     st.title("Project L.I.G.H.T.")
@@ -27,4 +27,5 @@ try:
         st.info("System Online: Awaiting data from the microcontroller...")
 
 except Exception as e:
+
     st.warning("Connect plug in the hardware components to see real-time results.")
