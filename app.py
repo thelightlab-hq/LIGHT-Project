@@ -1,65 +1,41 @@
-import streamlit as st
-import firebase_admin
-from firebase_admin import credentials, db
+#include <WiFi.h>
+#include <FirebaseESP32.h>
 
-#Layout
-st.set_page_config(page_title="L.I.G.H.T. Dashboard", layout="wide")
+// --- 1. UNIQUE IDENTITY (Differentiation) ---
+#define DEVICE_ID "LIGHT_UNIT_01" 
 
-st.markdown("""
-    <style>
-    .stApp { background-color: #FFFFFF; }
-    .unit-card {
-        background-color: #FBFBFB;
-        border: 1px solid #E0E0E0;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    .status-online { color: #00FF00; font-weight: bold; }
-    </style>
-    """, unsafe_allow_html=True)
+// --- 2. NETWORK CREDENTIALS ---
+#define WIFI_SSID "YOUR_WIFI_NAME"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
 
-#Firebase Connection
-if not firebase_admin._apps:
-    # Use your secret key from Streamlit Cloud Secrets
-    cred = credentials.Certificate(dict(st.secrets["firebase_key"]))
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': "https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
-    })
+// --- 3. FIREBASE CONFIGURATION ---
+#define FIREBASE_HOST "light-40317-default-rtdb.asia-southeast1.firebasedatabase.app"
+#define FIREBASE_AUTH "PASTE_YOUR_DATABASE_SECRET_HERE" 
 
-#Differentiation Logic
-st.title("Project L.I.G.H.T. Public Network")
-st.write("Monitoring localized inspection units in real-time.")
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
 
-#Fetch Files
-all_units = db.reference("/").get()
+void setup() {
+  Serial.begin(115200);
+  WiFi.begin(Rendezvous, mochimochae);
+  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+  
+  config.host = FIREBASE_HOST;
+  config.signer.tokens.legacy_token = FIREBASE_AUTH;
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
+}
 
-if all_units:
-    #Prevent Overlap
-    for unit_id, sensors in all_units.items():
-        if not isinstance(sensors, dict): continue
-        
-        with st.container():
-            # Header for each specific device
-            st.markdown(f"### 📟 Device ID: **{unit_id}**")
-            
-            col1, col2, col3 = st.columns([1, 1, 1])
-            
-            with col1:
-                # Differentiated data: pulls 'temp_level'
-                temp = sensors.get('temp_level', 0.0)
-                st.metric("Temperature", f"{temp}°C")
-            
-            with col2:
-                # Differentiated data: pulls 'gas_level'
-                gas = sensors.get('gas_level', 0)
-                st.metric("Gas Anomaly", f"{gas} ppm")
-            
-            with col3:
-                # Safety Logic
-                is_safe = "SAFE" if gas < 400 else "DANGER"
-                st.subheader(f"Status: {is_safe}")
-            
-            st.divider() #Separation line
-else:
-    st.info("No active hardware detected. Check ESP32 connection.")
+void loop() {
+  float gasValue = analogRead(34); 
+  float tempValue = analogRead(35);
+  String path = "/" + String(DEVICE_ID);
+
+  // Sending data to unique folders to prevent overlap
+  Firebase.setFloat(fbdo, path + "/gas_level", gasValue);
+  Firebase.setFloat(fbdo, path + "/temp_level", tempValue);
+  Firebase.setString(fbdo, path + "/status", "Online");
+
+  delay(3000); 
+}
