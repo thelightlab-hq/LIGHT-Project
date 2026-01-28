@@ -2,77 +2,84 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 
-#Firebase Bridge for Hardware Connection
-DB_URL ="https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
+#Website Layout Theme
+st.set_page_config(page_title="L.I.G.H.T.", layout="wide")
 
 st.markdown("""
     <style>
     .stApp { background-color: #FFFFFF; }
     
-    /* Soft Neon Floating Cards */
-    [data-testid="stMetric"] {
-        background-color: #F8F9FA; 
+    /* Individual Device Cards with Soft Glow */
+    .device-container {
+        background-color: #F8F9FA;
         border: 1px solid #E0E0E0;
         padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
     }
-
-    /* Custom CSS Device Visual (30x30 Unit) */
-    .device-box {
-        width: 280px;
-        height: 280px;
-        background: #F8F9FA;
-        border: 3px solid #E0E0E0;
+    
+    .unit-id-badge {
+        background-color: #000000;
+        color: white;
+        padding: 5px 15px;
         border-radius: 20px;
-        margin: auto;
-        position: relative;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-    }
-    .device-window {
-        width: 200px;
-        height: 150px;
-        background: #FFFFFF;
-        border: 1px solid #EEEEEE;
-        margin: 30px auto;
-        border-radius: 5px;
-    }
-    .status-light {
-        width: 10px;
-        height: 10px;
-        background: #00FF00;
-        border-radius: 50%;
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        box-shadow: 0 0 10px #00FF00;
+        font-size: 14px;
+        font-weight: bold;
     }
     </style>
     """, unsafe_allow_html=True)
 
+#Firebase Bridge
 if not firebase_admin._apps:
     cred = credentials.Certificate(dict(st.secrets["firebase_key"]))
-    firebase_admin.initialize_app(cred, {'databaseURL': DB_URL})
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    })
 
-    st.title("Project L.I.G.H.T.")
-    st.subheader("Food Safety Scanning System")
+#Multi-Device Dashboard
+st.title("Project L.I.G.H.T.")
+st.caption("Food Bacteria Detector")
+st.divider()
 
-#Real-time Data
-try:
-    ref = db.reference('mq2_data')
-    gas_val = ref.get()
+#Gather Data From Firebase Root
+network_data = db.reference("/").get()
 
-    if gas_val is not None:
-        st.metric(label="Current Gas Level (MQ2)", value=f"{gas_val} PPM")
-        if gas_val > 400:
-            st.error("ALERT: High Gas Level Detected!")
-        else:
-            st.success("Air Quality is Normal")
-    else:
-        st.info("System Online: Awaiting data from the microcontroller...")
+if network_data:
+    #Overlap Security
+    for device_id, data in network_data.items():
+        #Declining Other Data
+        if not isinstance(data, dict): continue
+        
+        #Specific Device ID
+        with st.container():
+            st.markdown(f"### <span class='unit-id-badge'>UNIT ID: {device_id}</span>", unsafe_allow_html=True)
+            
+            #Layout Columns
+            col_l, col_c, col_r = st.columns([1, 2, 1])
+            
+            with col_l:
+                # Unique Differentiated Data
+                st.metric(label="MQ-2 Gas Sensor", value=f"{data.get('gas_level', 0)} ppm")
+                st.metric(label="Status", value=data.get('status', 'Online'))
 
-except Exception as e:
+            with col_c:
+                #Symbol
+                st.markdown(f"""
+                    <div style='text-align: center; padding: 20px; border: 1px solid #EEE; border-radius: 10px;'>
+                        <div style='width: 120px; height: 100px; background: #333; margin: auto; border: 3px solid #AAA;'></div>
+                        <p style='margin-top: 10px; color: #666;'>Polycarbonate Prototype</p>
+                    </div>
+                """, unsafe_allow_html=True)
 
-    st.warning("Connect plug in the hardware components to see real-time results.")
-
-
+            with col_r:
+                temp = data.get('temp_level', 22)
+                st.metric(label="Internal Temp", value=f"{temp}°C")
+                # Automated Safety Logic
+                gas_val = data.get('gas_level', 0)
+                safety = "SAFE" if gas_val < 400 else "SPOILAGE RISK"
+                st.metric(label="Safety Level", value=safety)
+            
+            st.divider()
+else:
+    st.info("Searching for active L.I.G.H.T. units... Please ensure your ESP32 is powered on.")
