@@ -1,41 +1,50 @@
-#include <WiFi.h>
-#include <FirebaseESP32.h>
+import streamlit as st
+import firebase_admin
+from firebase_admin import credentials, db
 
-// --- 1. UNIQUE IDENTITY (Differentiation) ---
-#define DEVICE_ID "LIGHT_UNIT_01" 
+# --- 1. THEME & UI ---
+st.set_page_config(page_title="L.I.G.H.T. Network", layout="wide")
+st.markdown("<style>.stApp { background-color: #FFFFFF; }</style>", unsafe_allow_html=True)
 
-// --- 2. NETWORK CREDENTIALS ---
-#define WIFI_SSID "YOUR_WIFI_NAME"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
+# --- 2. SECURE FIREBASE CONNECTION ---
+if not firebase_admin._apps:
+    # This dictionary contains the secret key you sent earlier
+    firebase_creds = {
+        "type": "service_account",
+        "project_id": "light-40317",
+        "private_key_id": "3770ac85dc5b83de8aa8d537eb9a5d7cb7438ee7",
+        "private_key": st.secrets["private_key"].replace('\\n', '\n'),
+        "client_email": "firebase-adminsdk-fbsvc@light-40317.iam.gserviceaccount.com",
+        "token_uri": "https://oauth2.googleapis.com/token",
+    }
+    
+    cred = credentials.Certificate(firebase_creds)
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://light-40317-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    })
 
-// --- 3. FIREBASE CONFIGURATION ---
-#define FIREBASE_HOST "light-40317-default-rtdb.asia-southeast1.firebasedatabase.app"
-#define FIREBASE_AUTH "PASTE_YOUR_DATABASE_SECRET_HERE" 
+# --- 3. DYNAMIC MULTI-UNIT DASHBOARD ---
+st.title("Project L.I.G.H.T. Real-time Network")
+st.write("Automatically detecting localized inspection units...")
 
-FirebaseData fbdo;
-FirebaseAuth auth;
-FirebaseConfig config;
+all_data = db.reference("/").get()
 
-void setup() {
-  Serial.begin(115200);
-  WiFi.begin(Rendezvous, mochimochae);
-  while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
-  
-  config.host = FIREBASE_HOST;
-  config.signer.tokens.legacy_token = FIREBASE_AUTH;
-  Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
-}
-
-void loop() {
-  float gasValue = analogRead(34); 
-  float tempValue = analogRead(35);
-  String path = "/" + String(DEVICE_ID);
-
-  // Sending data to unique folders to prevent overlap
-  Firebase.setFloat(fbdo, path + "/gas_level", gasValue);
-  Firebase.setFloat(fbdo, path + "/temp_level", tempValue);
-  Firebase.setString(fbdo, path + "/status", "Online");
+if all_data:
+    for device_id, sensors in all_data.items():
+        if isinstance(sensors, dict):
+            with st.expander(f"📟 UNIT: {device_id}", expanded=True):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Gas Level", f"{sensors.get('gas_level', 0)} ppm")
+                with col2:
+                    st.metric("Temperature", f"{sensors.get('temp_level', 0)}°C")
+                with col3:
+                    gas = sensors.get('gas_level', 0)
+                    status = "✅ SAFE" if gas < 400 else "⚠️ ANOMALY"
+                    st.subheader(status)
+else:
+    st.warning("No hardware units detected. Please check your ESP32.")
 
   delay(3000); 
 }
+
