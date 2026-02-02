@@ -45,6 +45,3 @@ if all_data:
 else:
     st.warning("No hardware units detected. Please check your ESP32.")
 
-  delay(3000); 
-}
-
