@@ -37,7 +37,7 @@ if all_units:
         # This check ensures we only process folders with sensor data
         if isinstance(data, dict):
             with st.container():
-                st.markdown(f"### 📡 Unit ID: **{unit_id}**")
+                st.markdown(f"### 📡 Unit ID: *{unit_id}*")
                 
                 # Display metrics in a professional grid
                 col1, col2, col3 = st.columns(3)
