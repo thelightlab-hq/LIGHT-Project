@@ -13,7 +13,7 @@ if not firebase_admin._apps:
         "type": "service_account",
         "project_id": "light-40317",
         "private_key_id": "3770ac85dc5b83de8aa8d537eb9a5d7cb7438ee7",
-        "private_key": st.secrets["private_key"].replace('\\n',[firebase_key]
+        "private_key": st.secrets["private_key"].replace('\\n',
 type = "service_account"
 project_id = "light-40317"
 private_key_id = "3770ac85dc5b83de8aa8d537eb9a5d7cb7438ee7"
@@ -55,5 +55,6 @@ if all_data:
                     st.subheader(status)
 else:
     st.warning("No hardware units detected. Please check your ESP32.")
+
 
 
