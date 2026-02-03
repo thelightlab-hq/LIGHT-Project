@@ -3,7 +3,7 @@ import firebase_admin
 from firebase_admin import credentials, db
 import time
 
-# --- 1. UI SETTINGS & DARK BOLD CSS ---
+#CSS CODES FOR THEME
 st.set_page_config(page_title="L.I.G.H.T. Dashboard", layout="wide")
 
 st.markdown("""
@@ -54,7 +54,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. FIREBASE AUTH ---
+#FIREBASE VERIFICATION
 if not firebase_admin._apps:
     try:
         key_dict = st.secrets["firebase_key"]
@@ -65,7 +65,7 @@ if not firebase_admin._apps:
     except Exception as e:
         st.error(f"Firebase Error: {e}")
 
-# --- 3. UI LAYOUT ---
+# LAYOUT
 st.markdown('<p class="neon-title">L.I.G.H.T.</p>', unsafe_allow_html=True)
 st.markdown('<p class="system-sub">REAL-TIME MONITORING</p>', unsafe_allow_html=True)
 
@@ -74,7 +74,7 @@ placeholder = st.empty()
 while True:
     with placeholder.container():
         try:
-            # Connect only to your specific device ID
+            #ONLY CONNECT TO A SPECIFIC DEVICE ID
             data = db.reference("/UNIT_01").get()
             if data:
                 col1, col2, col3 = st.columns(3)
@@ -92,5 +92,6 @@ while True:
         except:
             st.error("Lost connection to database.")
         
-        # REFRESH RATE: 5 Seconds
+        #5s REFRESH RATE
         time.sleep(5)
+
