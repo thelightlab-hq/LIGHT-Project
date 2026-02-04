@@ -84,6 +84,7 @@ while True:
                     st.markdown(f'<div class="metric-card" style="border-color:#d1d1d1;"><h3>TEMP</h3><p class="metric-value">{data.get("temp_level", 0)}°</p><p style="color:#0fa;">CELSIUS</p></div>', unsafe_allow_html=True)
                 with col3:
                     gas = data.get("gas_level", 0)
+                    temp_anomaly = data.get("temp_change", False) 
                     status = "STABLE" if gas < 400 else "ANOMALY"
                     status_color = "#00ffaa" if status == "STABLE" else "#ff4b4b"
                     st.markdown(f'<div class="metric-card" style="border-color:{status_color};"><h3>STATUS</h3><p style="font-size:3.5rem; color:{status_color}; font-weight:900;">{status}</p></div>', unsafe_allow_html=True)
@@ -94,5 +95,6 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
+
 
 
