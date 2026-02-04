@@ -96,6 +96,7 @@ while True:
                 with col3:
                     gas = data.get("gas_level", 0)
                     raw_temp = data.get ("temp_level", 0)
+                    status = "STABLE" if gas < 400 else "ANOMALY"
                    # status = "ANOMALY" if (gas_anomaly or temp_anomaly) else "STABLE"
                     status_color = "#00ffaa" if status == "STABLE" else "#ff4b4b"
                     st.markdown(f'<div class="metric-card" style="border-color:{status_color};"><h3>STATUS</h3><p style="font-size:3.5rem; color:{status_color}; font-weight:900;">{status}</p></div>', unsafe_allow_html=True)
@@ -106,6 +107,7 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
+
 
 
 
