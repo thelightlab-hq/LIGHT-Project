@@ -65,11 +65,7 @@ if not firebase_admin._apps:
     except Exception as e:
         st.error(f"Firebase Error: {e}")
         
-if "prev_temp" not in st.session_state:
-    st.session_state.prev_temp = None
 
-if "temp_changed" not in st.session_state:
-    st.session_state.temp_changed = False
 
 TEMP_THRESHOLD = 0.8
 GAS_THRESHOLD = 400
@@ -110,5 +106,6 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
+
 
 
