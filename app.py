@@ -77,8 +77,6 @@ while True:
             #ONLY CONNECT TO A SPECIFIC DEVICE ID
             data = db.reference("/UNIT_01").get()
             if data:
-                gas_anomaly = gas >= 400
-                temp_anomaly = data.get("temp_change", 0)
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.markdown(f'<div class="metric-card" style="border-color:#ffffff;"><h3>GAS</h3><p class="metric-value">{data.get("gas_level", 0)}</p><p style="color:#0fa;">PPM</p></div>', unsafe_allow_html=True)
@@ -86,7 +84,7 @@ while True:
                     st.markdown(f'<div class="metric-card" style="border-color:#d1d1d1;"><h3>TEMP</h3><p class="metric-value">{data.get("temp_level", 0)}°</p><p style="color:#0fa;">CELSIUS</p></div>', unsafe_allow_html=True)
                 with col3:
                     gas = data.get("gas_level", 0)
-                    status = "ANOMALY" if (gas_anomaly or temp_anomaly) else "STABLE"
+                    status = "STABLE" if gas < 400 else "ANOMALY"
                     status_color = "#00ffaa" if status == "STABLE" else "#ff4b4b"
                     st.markdown(f'<div class="metric-card" style="border-color:{status_color};"><h3>STATUS</h3><p style="font-size:3.5rem; color:{status_color}; font-weight:900;">{status}</p></div>', unsafe_allow_html=True)
             else:
