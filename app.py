@@ -64,11 +64,6 @@ if not firebase_admin._apps:
         })
     except Exception as e:
         st.error(f"Firebase Error: {e}")
-        
-
-
-TEMP_THRESHOLD = 0.8
-GAS_THRESHOLD = 400
 
 # LAYOUT
 st.markdown('<p class="neon-title">L.I.G.H.T.</p>', unsafe_allow_html=True)
@@ -82,12 +77,8 @@ while True:
             #ONLY CONNECT TO A SPECIFIC DEVICE ID
             data = db.reference("/UNIT_01").get()
             if data:
-                
-
-                # STATUS LOGIC
-              #  gas_anomaly = gas >= GAS_THRESHOLD
-               # temp_anomaly = st.session_state.temp_changed
-                
+                gas_anomaly = gas >= 400
+                temp_anomaly = data.get("temp_change", 0)
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     st.markdown(f'<div class="metric-card" style="border-color:#ffffff;"><h3>GAS</h3><p class="metric-value">{data.get("gas_level", 0)}</p><p style="color:#0fa;">PPM</p></div>', unsafe_allow_html=True)
@@ -95,9 +86,7 @@ while True:
                     st.markdown(f'<div class="metric-card" style="border-color:#d1d1d1;"><h3>TEMP</h3><p class="metric-value">{data.get("temp_level", 0)}°</p><p style="color:#0fa;">CELSIUS</p></div>', unsafe_allow_html=True)
                 with col3:
                     gas = data.get("gas_level", 0)
-                    raw_temp = data.get ("temp_level", 0)
-                    status = "STABLE" if gas < 400 else "ANOMALY"
-                   # status = "ANOMALY" if (gas_anomaly or temp_anomaly) else "STABLE"
+                    status = "ANOMALY" if (gas_anomaly or temp_anomaly) else "STABLE"
                     status_color = "#00ffaa" if status == "STABLE" else "#ff4b4b"
                     st.markdown(f'<div class="metric-card" style="border-color:{status_color};"><h3>STATUS</h3><p style="font-size:3.5rem; color:{status_color}; font-weight:900;">{status}</p></div>', unsafe_allow_html=True)
             else:
@@ -107,9 +96,5 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
-
-
-
-
 
 
