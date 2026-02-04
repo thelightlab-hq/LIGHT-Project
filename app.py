@@ -86,17 +86,7 @@ while True:
             #ONLY CONNECT TO A SPECIFIC DEVICE ID
             data = db.reference("/UNIT_01").get()
             if data:
-                if st.session_state.prev_temp is None:
-                    temp = raw_temp 
-                    st.session_state.prev_temp = raw_temp
-                    st.session_state.temp_changed = False 
-                elif abs (raw_temp - st.session_state.prev_temp) >= TEMP_THRESHOLD:
-                    temp = raw_temp
-                    st.session_state.prev_temp = raw_temp
-                    st.session_state.temp_changed = True
-                else: 
-                    temp = st.session_state.prev_temp
-                    st.session_state.temp_changed = False
+                
 
                 # STATUS LOGIC
                 gas_anomaly = gas >= GAS_THRESHOLD
@@ -120,4 +110,5 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
+
 
