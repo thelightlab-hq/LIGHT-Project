@@ -85,8 +85,8 @@ while True:
                 
 
                 # STATUS LOGIC
-                gas_anomaly = gas >= GAS_THRESHOLD
-                temp_anomaly = st.session_state.temp_changed
+              #  gas_anomaly = gas >= GAS_THRESHOLD
+               # temp_anomaly = st.session_state.temp_changed
                 
                 col1, col2, col3 = st.columns(3)
                 with col1:
@@ -106,6 +106,7 @@ while True:
         
         #5s REFRESH RATE
         time.sleep(5)
+
 
 
 
