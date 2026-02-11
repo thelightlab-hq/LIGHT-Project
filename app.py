@@ -2,17 +2,20 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 import time
+from datetime import datetime
 
-# CSS CODES FOR THEME - Enhanced with 3-way color logic
+#CSS Layout & Website Interior
 st.set_page_config(page_title="L.I.G.H.T. Dashboard", layout="wide")
 
 st.markdown("""
     <style>
     .stApp { background-color: #000000; }
     
+    /* Title Styling */
     .neon-title {
-        color: #ffffff;
-        font-size: 100px !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        font-size: 80px !important;
         font-weight: 900;
         text-align: center;
         text-transform: uppercase;
@@ -21,40 +24,45 @@ st.markdown("""
         margin-bottom: 0px;
     }
 
+    /* Card Styling - Fixed alignment and glow */
     .metric-card {
         background-color: #111111; 
         border-radius: 25px;
-        padding: 40px;
-        color: #ffffff;
+        padding: 30px;
+        color: #ffffff !important;
         text-align: center;
         min-height: 350px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         border: 6px solid #d1d1d1; 
         transition: all 0.5s ease-in-out;
+    }
+
+    /* Removing the "Link" look from text */
+    .metric-card h3, .metric-card p {
+        color: #ffffff !important;
+        text-decoration: none !important;
+        margin: 5px 0px;
     }
 
     .metric-value {
         font-size: 4.5rem;
         font-weight: 900;
-        color: #ffffff;
-        margin-bottom: 0px;
+        line-height: 1;
     }
 
     .status-label {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         font-weight: 700;
         letter-spacing: 2px;
-        margin-top: 10px;
         text-transform: uppercase;
     }
-    
-    h3 { color: #ffffff !important; letter-spacing: 3px; margin-bottom: 0px; }
     </style>
     """, unsafe_allow_html=True)
 
-# FIREBASE VERIFICATION
+#Firebase Connection
 if not firebase_admin._apps:
     try:
         key_dict = st.secrets["firebase_key"]
@@ -65,72 +73,53 @@ if not firebase_admin._apps:
     except Exception as e:
         st.error(f"Firebase Error: {e}")
 
-# LAYOUT
 st.markdown('<p class="neon-title">L.I.G.H.T.</p>', unsafe_allow_html=True)
-st.markdown('<p class="system-sub" style="text-align:center; color:#d1d1d1; letter-spacing:5px;">REAL-TIME MONITORING</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#d1d1d1; letter-spacing:5px; margin-bottom:30px;">REAL-TIME MONITORING SYSTEM</p>', unsafe_allow_html=True)
 
 placeholder = st.empty()
 
 while True:
     with placeholder.container():
         try:
+            #Data Fetcher
             data = db.reference("/UNIT_01").get()
+            
             if data:
                 gas_val = data.get("gas_level", 0)
                 temp_val = data.get("temp_level", 0)
                 
-                # --- GAS LOGIC ---
+                #Gas Indicator
                 gas_status = "CLEAN" if gas_val < 400 else "CONTAMINATED"
                 gas_glow = "#00ffaa" if gas_status == "CLEAN" else "#ff4b4b"
                 
-                # --- TEMP LOGIC (Cold, Warm, Hot) ---
+                #Temperature Indicator
                 if temp_val < 28:
-                    temp_status = "COLD"
-                    temp_glow = "#00ccff" # Blue
+                    temp_status, temp_glow = "COLD", "#00ccff"
                 elif 28 <= temp_val < 35:
-                    temp_status = "WARM"
-                    temp_glow = "#ffcc00" # Yellow/Gold
+                    temp_status, temp_glow = "WARM", "#ffcc00"
                 else:
-                    temp_status = "HOT"
-                    temp_glow = "#ff4b4b" # Red
+                    temp_status, temp_glow = "HOT", "#ff4b4b"
                 
-                # --- OVERALL STATUS ---
+                #Final Judger
                 overall_status = "STABLE" if (gas_val < 400 and temp_val < 35) else "ANOMALY"
                 overall_glow = "#00ffaa" if overall_status == "STABLE" else "#ff4b4b"
 
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.markdown(f"""
-                        <div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 25px {gas_glow}55;">
-                            <h3>GAS</h3>
-                            <p class="metric-value">{gas_val}</p>
-                            <p style="color:{gas_glow};" class="status-label">{gas_status}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 20px {gas_glow}44;"><h3>GAS</h3><p class="metric-value">{gas_val}</p><p style="color:{gas_glow};" class="status-label">{gas_status}</p></div>', unsafe_allow_html=True)
                     
                 with col2:
-                    st.markdown(f"""
-                        <div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 25px {temp_glow}55;">
-                            <h3>TEMP</h3>
-                            <p class="metric-value">{temp_val}°</p>
-                            <p style="color:{temp_glow};" class="status-label">{temp_status}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 20px {temp_glow}44;"><h3>TEMP</h3><p class="metric-value">{temp_val}°</p><p style="color:{temp_glow};" class="status-label">{temp_status}</p></div>', unsafe_allow_html=True)
                     
                 with col3:
-                    st.markdown(f"""
-                        <div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 25px {overall_glow}55;">
-                            <h3>STATUS</h3>
-                            <p style="font-size:3.5rem; color:{overall_glow}; font-weight:900; margin-top:20px;">{overall_status}</p>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 20px {overall_glow}44;"><h3>STATUS</h3><p style="font-size:3rem; color:{overall_glow}; font-weight:900;">{overall_status}</p></div>', unsafe_allow_html=True)
+            
             else:
-                st.info("Awaiting Stream from UNIT_01...")
+                #Device disconnection warning
+                st.warning("DEVICE DISCONNECTED: UNIT_01 is offline.")
+                
         except Exception as e:
-            st.error(f"Connection Error: {e}")
+            st.error("DATABASE ERROR: Check your internet connection or Firebase Rules.")
         
         time.sleep(5)
-
-
-
