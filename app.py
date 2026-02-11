@@ -45,7 +45,7 @@ st.markdown("""
     }
 
     .metric-value {
-        font-size: 3.2rem; /* Adjusted for decimal space */
+        font-size: 3.2rem; 
         font-weight: 900;
         line-height: 1.2;
         margin: 5px 0;
@@ -87,7 +87,7 @@ while True:
             data = db.reference("/UNIT_01").get()
             
             if data is not None:
-                # Raw data with two decimals
+                #Raw data fetching
                 gas_val = float(data.get("gas_level", 0))
                 temp_val = float(data.get("temp_level", 0))
                 
@@ -109,11 +109,12 @@ while True:
 
                 col1, col2, col3 = st.columns(3)
                 
-                #Decimal Places
                 with col1:
+                    #Gas two decimal round off
                     st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 20px {gas_glow}44;"><div class="card-header">GAS</div><div class="metric-value">{gas_val:.2f}</div><div style="color:{gas_glow};" class="status-label">{gas_status}</div></div>', unsafe_allow_html=True)
                     
                 with col2:
+                    #Temperature two decimal round off
                     st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 20px {temp_glow}44;"><div class="card-header">TEMP</div><div class="metric-value">{temp_val:.2f}°</div><div style="color:{temp_glow};" class="status-label">{temp_status}</div></div>', unsafe_allow_html=True)
                     
                 with col3:
@@ -121,7 +122,6 @@ while True:
             
             else:
                 #Disconnection of UNIT_01 Warning
-                st.write("")
                 st.error("OFFLINE: Device is disconnected. Waiting for connection...")
                 
         except Exception as e:
