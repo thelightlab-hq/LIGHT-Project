@@ -85,12 +85,14 @@ while True:
             ref = db.reference("/UNIT_01")
             data = ref.get()
             
-        
             is_offline = True
+            
             if data:
                 #Real-time Update Disconnection
                 gas_val = float(data.get("gas_level", 0))
                 temp_val = float(data.get("temp_level", 0))
+
+                #Firebase real-time update
                 is_offline = False 
 
             if not is_offline:
@@ -110,9 +112,9 @@ while True:
 
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 20px {gas_glow}44;"><div class="card-header">GAS</div><div class="metric-value">{gas_val:.2f}</div><div style="color:{gas_glow}; font-weight:700;">{gas_status}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 20px {gas_glow}44;"><div class="card-header">GAS (PPM)</div><div class="metric-value">{gas_val:.2f}</div><div style="color:{gas_glow}; font-weight:700;">{gas_status}</div></div>', unsafe_allow_html=True)
                 with col2:
-                    st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 20px {temp_glow}44;"><div class="card-header">TEMP</div><div class="metric-value">{temp_val:.2f}°</div><div style="color:{temp_glow}; font-weight:700;">{temp_status}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 20px {temp_glow}44;"><div class="card-header">TEMP (°C)</div><div class="metric-value">{temp_val:.2f}</div><div style="color:{temp_glow}; font-weight:700;">{temp_status}</div></div>', unsafe_allow_html=True)
                 with col3:
                     st.markdown(f'<div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 20px {overall_glow}44;"><div class="card-header">STATUS</div><div style="font-size:2.8rem; color:{overall_glow}; font-weight:900; margin-top:10px;">{overall_status}</div></div>', unsafe_allow_html=True)
                 
@@ -122,7 +124,7 @@ while True:
             else:
                 #Device Status Indicator
                 st.markdown("<br><br><br>", unsafe_allow_html=True)
-                st.markdown('<p style="text-align:center; color:#ff4b4b; font-weight:900; letter-spacing:2px; font-size:1.5rem; border: 2px solid #ff4b4b; padding: 20px; border-radius: 10px;">DEVICE OFFLINE: WAITING FOR UNIT_01 CONNECTION...</p>', unsafe_allow_html=True)
+                st.markdown('<p style="text-align:center; color:#ff4b4b; font-weight:900; letter-spacing:2px; font-size:1.5rem; border: 2px solid #ff4b4b; padding: 20px; border-radius: 10px; background: rgba(255,0,0,0.1);">DEVICE OFFLINE: WAITING FOR UNIT_01 CONNECTION...</p>', unsafe_allow_html=True)
                 
         except Exception as e:
             st.error(f"SYSTEM ERROR: {e}")
