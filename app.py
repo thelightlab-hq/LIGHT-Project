@@ -2,7 +2,6 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 import time
-from datetime import datetime
 
 #Layouts
 st.set_page_config(page_title="L.I.G.H.T. Dashboard", layout="wide")
@@ -85,17 +84,11 @@ while True:
             ref = db.reference("/UNIT_01")
             data = ref.get()
             
-            is_offline = True
-            
             if data:
                 #Real-time Update Disconnection
                 gas_val = float(data.get("gas_level", 0))
                 temp_val = float(data.get("temp_level", 0))
 
-                #Firebase real-time update
-                is_offline = False 
-
-            if not is_offline:
                 #Indicators
                 gas_status = "CLEAN" if gas_val < 400 else "CONTAMINATED"
                 gas_glow = "#00ffaa" if gas_status == "CLEAN" else "#ff4b4b"
@@ -118,13 +111,9 @@ while True:
                 with col3:
                     st.markdown(f'<div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 20px {overall_glow}44;"><div class="card-header">STATUS</div><div style="font-size:2.8rem; color:{overall_glow}; font-weight:900; margin-top:10px;">{overall_status}</div></div>', unsafe_allow_html=True)
                 
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown('<p style="text-align:center; color:#ffffff; font-weight:700; letter-spacing:2px;">● DEVICE ONLINE: UNIT_01 CONNECTED</p>', unsafe_allow_html=True)
-            
             else:
-                #Device Status Indicator
-                st.markdown("<br><br><br>", unsafe_allow_html=True)
-                st.markdown('<p style="text-align:center; color:#ff4b4b; font-weight:900; letter-spacing:2px; font-size:1.5rem; border: 2px solid #ff4b4b; padding: 20px; border-radius: 10px; background: rgba(255,0,0,0.1);">DEVICE OFFLINE: WAITING FOR UNIT_01 CONNECTION...</p>', unsafe_allow_html=True)
+                # Still show the cards with zero if no data is found
+                st.warning("Waiting for data from UNIT_01...")
                 
         except Exception as e:
             st.error(f"SYSTEM ERROR: {e}")
