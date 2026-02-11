@@ -2,6 +2,7 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 import time
+from datetime import datetime
 
 #Layout & Appearance
 st.set_page_config(page_title="L.I.G.H.T. Dashboard", layout="wide")
@@ -12,57 +13,55 @@ st.markdown("""
     
     .neon-title {
         color: #ffffff !important;
-        font-size: 80px !important;
+        font-size: 60px !important; 
         font-weight: 900;
         text-align: center;
         text-transform: uppercase;
-        letter-spacing: 15px;
-        text-shadow: 0 0 20px #0fa;
+        letter-spacing: 10px;
+        text-shadow: 0 0 15px #0fa;
         margin-bottom: 0px;
     }
 
     /*Borders*/
     .metric-card {
         background-color: #111111; 
-        border-radius: 25px;
-        padding: 30px;
+        border-radius: 20px;
+        padding: 25px;
         color: #ffffff !important;
         text-align: center;
-        min-height: 350px;
+        min-height: 280px; 
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        border: 6px solid #d1d1d1; 
-        transition: all 0.5s ease-in-out;
+        border: 5px solid #d1d1d1; 
+        transition: all 0.5s ease;
     }
 
     .card-header {
-        font-size: 2rem;
+        font-size: 1.5rem; 
         font-weight: 800;
-        letter-spacing: 3px;
-        margin-bottom: 10px;
+        letter-spacing: 2px;
         color: #ffffff !important;
     }
 
     .metric-value {
-        font-size: 5rem;
+        font-size: 3rem; 
         font-weight: 900;
-        line-height: 1;
-        margin: 10px 0;
+        line-height: 1.2;
+        margin: 5px 0;
     }
 
     .status-label {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
         font-weight: 700;
-        letter-spacing: 2px;
         text-transform: uppercase;
-        margin-top: 10px;
     }
 
-    /*Achor Links from Header Remover*/
+    /*Anchor Links from Header Remover*/
     button[kind="header"] { display: none; }
-    .stMarkdown h3 a { display: none !important; }
+    .stMarkdown h3 a, .stMarkdown h2 a, .stMarkdown h1 a { display: none !important; }
+    [data-testid="stHeader"] { display: none; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -111,19 +110,24 @@ while True:
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
-                    st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 25px {gas_glow}44;"><div class="card-header">GAS</div><div class="metric-value">{gas_val}</div><div style="color:{gas_glow};" class="status-label">{gas_status}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{gas_glow}; box-shadow: 0 0 20px {gas_glow}44;"><div class="card-header">GAS</div><div class="metric-value">{gas_val}</div><div style="color:{gas_glow};" class="status-label">{gas_status}</div></div>', unsafe_allow_html=True)
                     
                 with col2:
-                    st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 25px {temp_glow}44;"><div class="card-header">TEMP</div><div class="metric-value">{temp_val}°</div><div style="color:{temp_glow};" class="status-label">{temp_status}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{temp_glow}; box-shadow: 0 0 20px {temp_glow}44;"><div class="card-header">TEMP</div><div class="metric-value">{temp_val}°</div><div style="color:{temp_glow};" class="status-label">{temp_status}</div></div>', unsafe_allow_html=True)
                     
                 with col3:
-                    st.markdown(f'<div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 25px {overall_glow}44;"><div class="card-header">STATUS</div><div style="font-size:3.5rem; color:{overall_glow}; font-weight:900; margin-top:10px;">{overall_status}</div></div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="metric-card" style="border-color:{overall_glow}; box-shadow: 0 0 20px {overall_glow}44;"><div class="card-header">STATUS</div><div style="font-size:2.5rem; color:{overall_glow}; font-weight:900; margin-top:10px;">{overall_status}</div></div>', unsafe_allow_html=True)
+                
+                #Syncing
+                st.write("")
+                st.caption(f"Last Sync: {datetime.now().strftime('%H:%M:%S')} | Device: UNIT_01")
             
             else:
                 #Disconnection of UNIT_01 Warning
+                st.write("")
                 st.error("OFFLINE: Device is disconnected. Waiting for connection...")
                 
         except Exception as e:
             st.error(f"SYSTEM ERROR: {e}")
         
-        time.sleep(5)
+        time.sleep(7)
